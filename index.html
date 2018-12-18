@@ -1,7 +1,6 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Bootstrap Example</title>
+  <title>P O R T F O L I O</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
@@ -14,12 +13,209 @@
 
 <div class="container-fluid">
   
-  <h3 align ="right">P O R T<strong>F O L I O</strong></h3>  
   <div class="row">
-    <div class="col-sm-6" ><canvas id="scene"></canvas>
-	<input id="copy" type="text" value="P O R T F O L I O" />
-<p>Click anywhere to change the radius of your mouse</p></div>
-    <div class="col-sm-6" > <div id="column-nav" class="col-md-2 col-lg-1 sticky-top" style="" >
+    <div id="left-column" class="col-sm-6 bg-dark">
+<style>
+@import url('https://fonts.googleapis.com/css?family=Montserrat:200,300,400,600')
+.more-pens
+  position: fixed
+  left: 20px
+  bottom: 20px
+  z-index: 10
+  font-family: "Montserrat"
+  font-size: 12px
+
+a.white-mode, a.white-mode:link, a.white-mode:visited, a.white-mode:active
+  font-family: "Montserrat"
+  font-size: 12px
+  text-decoration: none
+  background: #212121
+  padding: 4px 8px
+  color: #f7f7f7
+  &:hover
+    background: #edf3f8
+    color: #212121
+
+body
+  margin: 0
+  padding: 0
+  overflow: hidden
+  width: 100%
+  height: 100%
+  background: #111111
+
+
+.title
+  z-index: 10
+  position: absolute
+  left: 50%
+  top: 50%
+  height: 250px
+  transform: translateX(-50%) translateY(-50%)
+  font-family: "Montserrat"
+  text-align: center
+  width: 100%
+
+
+  h3
+    position: absolute
+    bottom: 0
+    width: 100%
+    text-align: center
+    font-weight: 200
+    font-size: 20px
+    padding: 0
+    margin: 0
+    line-height: 1
+    color: #EEEEEE
+    letter-spacing: 2px
+</style>
+<script>
+let particles = [];
+let frequency = 20
+// Popolate particles
+setInterval(
+  function(){
+    popolate()
+  }.bind(this),
+  frequency
+)
+
+let c1 = createCanvas({width: $(window).width(), height: $(window).height()})
+let c2 = createCanvas({width: $(window).width(), height: $(window).height()})
+let c3 = createCanvas({width: $(window).width(), height: $(window).height()})
+
+let tela   = c1.canvas;
+let canvas = c1.context;
+
+// $("body").append(tela);
+$("#left-column").append(c3.canvas);
+writeText(c2.canvas, c2.context, "Pakorn\nNiyasom")
+
+
+class Particle{
+  constructor(canvas, options){
+    let random = Math.random()
+    this.canvas = canvas;
+    this.x = options.x
+    this.y = options.y
+    this.s = (3 + Math.random());
+    this.a = 0
+    this.w = $(window).width()
+    this.h = $(window).height()
+    this.radius = 0.5 + Math.random()*20
+    this.color  = this.radius > 5 ? "#FF5E4C" : "#ED413C" //this.randomColor()
+  }
+
+  randomColor() {
+    let colors = ["#FF5E4C", "#FFFFFF"];
+    return colors[this.randomIntFromInterval(0,colors.length-1)];
+  }
+
+  randomIntFromInterval(min,max){
+      return Math.floor(Math.random()*(max-min+1)+min);
+  }
+
+  render(){
+    this.canvas.beginPath();
+    this.canvas.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+    this.canvas.lineWidth = 2;
+    this.canvas.fillStyle = this.color;
+    this.canvas.fill();
+    this.canvas.closePath();
+  }
+
+  move(){
+    //this.swapColor()
+    this.x += Math.cos(this.a) * this.s;
+    this.y += Math.sin(this.a) * this.s;
+    this.a += Math.random() * 0.8 - 0.4;
+
+    if(this.x < 0 || this.x > this.w - this.radius){
+      return false
+    }
+
+    if(this.y < 0 || this.y > this.h - this.radius){
+      return false
+    }
+    this.render()
+    return true
+  }
+}
+
+function createCanvas(properties){
+  let canvas = document.createElement('canvas');
+      canvas.width = properties.width;
+      canvas.height = properties.height;
+  let context = canvas.getContext('2d');
+  return {
+    canvas: canvas,
+    context: context
+  }
+}
+
+function writeText(canvas, context, text){
+  let size = 100
+  context.font = size + "px Montserrat";
+  context.fillStyle = "#111111";
+  context.textAlign = "center";
+  let lineheight = 70
+  let lines = text.split('\n');
+  for(let i = 0; i<lines.length; i++){
+    context.fillText(lines[i], canvas.width/2, canvas.height/2 + lineheight*i - (lineheight*(lines.length-1))/3);
+  }
+}
+
+function maskCanvas(){
+  c3.context.drawImage(c2.canvas, 0, 0, c2.canvas.width, c2.canvas.height);
+  c3.context.globalCompositeOperation = 'source-atop';
+  c3.context.drawImage(c1.canvas, 0, 0);
+  blur(c1.context,c1.canvas, 2)
+}
+
+function blur(ctx,canvas, amt) {
+  ctx.filter = `blur(${amt}px)`
+  ctx.drawImage(canvas, 0, 0)
+  ctx.filter = 'none'
+}
+
+
+/*
+ * Function to clear layer canvas
+ * @num:number number of particles
+ */
+function popolate(){
+  particles.push(
+    new Particle(canvas,{
+      x: ($(window).width()/2),
+      y: ($(window).height()/2)
+    })
+  )
+  return particles.length
+}
+
+function clear(){
+  canvas.globalAlpha=0.03;
+  canvas.fillStyle='#111111';
+  canvas.fillRect(0, 0, tela.width, tela.height);
+  canvas.globalAlpha=1;
+}
+
+function update(){
+  clear();
+  particles = particles.filter(function(p) {
+    return p.move()
+  })
+  maskCanvas()
+  requestAnimationFrame(update.bind(this))
+}
+
+update()
+</script></div>
+	
+
+
+    <div class="col-sm-6" > <h3 align ="right">P O R T <strong>F O L I O</strong></h3><div id="column-nav" class="col-md-2 col-lg-1 sticky-top" style="" >
 					<nav id="navbar-main" class="navbar navbar-right sticky-top ">
 						<ul class="navbar-nav" >
 							<li class="nav-item">
@@ -34,183 +230,12 @@
 						</ul>
 					</nav>
 				</div></div>
+                
     
   </div>
 </div>
 
 </body>
-<script>
-body{
-			margin:0;
-			overflow: hidden;
-			font-size:0;
-		}
-		canvas{
-			background: black;
-			width: 100vw;
-			height: 100vh;
-		}
-		input{
-			width: 250px;
-			height: 40px;
-			line-height: 40px;
-			position: absolute;
-			bottom: 35px;
-			left: calc(50% - 125px);
-			background: none;
-			color: white;
-			font-size: 30px;
-			font-family: arial;
-			text-align: center;
-			border: 1px solid white;
-			background: rgba(255,255,255,0.2);
-		}
-p{
-  position: fixed;
-  left: 0;
-  bottom:5px;
-  color: #fff;
-  z-index:10;
-  font-size:16px;
-  font-family: Helvetica, Verdana, sans-serif;
-  opacity:0.5;
-  width: 100%;
-  text-align: center;
-  margin: 0;
-}
-</script>
-
-<script>
-
-	var canvas = document.querySelector("#scene"),
-		ctx = canvas.getContext("2d"),
-		particles = [],
-		amount = 0,
-		mouse = {x:0,y:0},
-		radius = 1;
-
-	var colors = ["#FF0000","#FF00CC", "#FF6666","#000000", "#CC3333"];
-
-	var copy = document.querySelector("#copy");
-
-	var ww = canvas.width = window.innerWidth;
-	var wh = canvas.height = window.innerHeight;
-
-	function Particle(x,y){
-		this.x =  Math.random()*ww;
-		this.y =  Math.random()*wh;
-		this.dest = {
-			x : x,
-			y: y
-		};
-		this.r =  Math.random()*5 + 2;
-		this.vx = (Math.random()-0.5)*20;
-		this.vy = (Math.random()-0.5)*20;
-		this.accX = 0;
-		this.accY = 0;
-		this.friction = Math.random()*0.05 + 0.94;
-
-		this.color = colors[Math.floor(Math.random()*6)];
-	}
-
-	Particle.prototype.render = function() {
 
 
-		this.accX = (this.dest.x - this.x)/1000;
-		this.accY = (this.dest.y - this.y)/1000;
-		this.vx += this.accX;
-		this.vy += this.accY;
-		this.vx *= this.friction;
-		this.vy *= this.friction;
-
-		this.x += this.vx;
-		this.y +=  this.vy;
-
-		ctx.fillStyle = this.color;
-		ctx.beginPath();
-		ctx.arc(this.x, this.y, this.r, Math.PI * 2, false);
-		ctx.fill();
-
-		var a = this.x - mouse.x;
-		var b = this.y - mouse.y;
-
-		var distance = Math.sqrt( a*a + b*b );
-		if(distance<(radius*70)){
-			this.accX = (this.x - mouse.x)/100;
-			this.accY = (this.y - mouse.y)/100;
-			this.vx += this.accX;
-			this.vy += this.accY;
-		}
-
-	}
-
-	function onMouseMove(e){
-		mouse.x = e.clientX;
-		mouse.y = e.clientY;
-	}
-
-	function onTouchMove(e){
-    if(e.touches.length > 0 ){
-      mouse.x = e.touches[0].clientX;
-      mouse.y = e.touches[0].clientY;
-    }
-	}
-
-function onTouchEnd(e){
-  mouse.x = -9999;
-  mouse.y = -9999;
-}
-
-	function initScene(){
-		ww = canvas.width = window.innerWidth;
-		wh = canvas.height = window.innerHeight;
-
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-		ctx.font = "bold "+(ww/8)+"px sans-serif";
-		ctx.textAlign = "center";
-		ctx.fillText(copy.value, ww/2, wh/2);
-
-		var data  = ctx.getImageData(0, 0, ww, wh).data;
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.globalCompositeOperation = "screen";
-
-		particles = [];
-		for(var i=0;i<ww;i+=Math.round(ww/150)){
-			for(var j=0;j<wh;j+=Math.round(ww/150)){
-				if(data[ ((i + j*ww)*4) + 3] > 150){
-					particles.push(new Particle(i,j));
-				}
-			}
-		}
-		amount = particles.length;
-
-	}
-
-	function onMouseClick(){
-		radius++;
-		if(radius ===5){
-			radius = 0;
-		}
-	}
-
-	function render(a) {
-		requestAnimationFrame(render);
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		for (var i = 0; i < amount; i++) {
-			particles[i].render();
-		}
-	};
-
-	copy.addEventListener("keyup", initScene);
-	window.addEventListener("resize", initScene);
-	window.addEventListener("mousemove", onMouseMove);
-	window.addEventListener("touchmove", onTouchMove);
-	window.addEventListener("click", onMouseClick);
-	window.addEventListener("touchend", onTouchEnd);
-	initScene();
-	requestAnimationFrame(render);
-
-
-</script>
 </html>
